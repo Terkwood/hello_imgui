@@ -1,0 +1,15 @@
+[package]
+name = "hello_imgui"
+version = "0.0.1"
+authors = ["Terkwood <<>>"]
+description = "intro to imgui using gfx"
+license = "MIT"
+publish = false
+
+[dependencies]
+gfx = "0.17"
+gfx_window_glutin = "0.22"
+glutin = "0.14"
+imgui = { version = "0.0.19-pre", path = "./imgui-rs" }
+imgui-gfx-renderer = { version = "0.0.19-pre", path = "./imgui-rs/imgui-gfx-renderer" }
+imgui-sys = { version = "0.0.19-pre", path = "./imgui-rs/imgui-sys", features = ["gfx", "glium"] }
