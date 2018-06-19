@@ -65,9 +65,15 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
     }
     imgui.set_ini_filename(None);
-    let config = ImFontConfig::new().oversample_h(1).pixel_snap_h(true).size_pixels(FONT_SIZE);
+    let config = ImFontConfig::new()
+        .oversample_h(1)
+        .pixel_snap_h(true)
+        .size_pixels(FONT_SIZE);
     config.rasterizer_multiply(1.75).add_font(
-        &mut imgui.fonts(), include_bytes!( "../../resources/Go-Mono.ttf"), &FontGlyphRange::japanese());
+        &mut imgui.fonts(),
+        include_bytes!("../../resources/Go-Mono.ttf"),
+        &FontGlyphRange::japanese(),
+    );
     let mut renderer = Renderer::init(&mut imgui, &mut factory, shaders, main_color.clone())
         .expect("Failed to initialize renderer");
 
@@ -79,8 +85,8 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
 
     'running: loop {
         events_loop.poll_events(|event| {
-            use glutin::WindowEvent::*;
             use glutin::ElementState::Pressed;
+            use glutin::WindowEvent::*;
             use glutin::{Event, MouseButton, MouseScrollDelta, TouchPhase};
 
             if let Event::WindowEvent { event, .. } = event {
@@ -114,30 +120,30 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
                             Some(Key::X) => imgui.set_key(16, pressed),
                             Some(Key::Y) => imgui.set_key(17, pressed),
                             Some(Key::Z) => imgui.set_key(18, pressed),
-                            Some(Key::LControl) |
-                            Some(Key::RControl) => imgui.set_key_ctrl(pressed),
-                            Some(Key::LShift) |
-                            Some(Key::RShift) => imgui.set_key_shift(pressed),
+                            Some(Key::LControl) | Some(Key::RControl) => {
+                                imgui.set_key_ctrl(pressed)
+                            }
+                            Some(Key::LShift) | Some(Key::RShift) => imgui.set_key_shift(pressed),
                             Some(Key::LAlt) | Some(Key::RAlt) => imgui.set_key_alt(pressed),
                             Some(Key::LWin) | Some(Key::RWin) => imgui.set_key_super(pressed),
                             _ => {}
                         }
                     }
-                    CursorMoved { position: (x, y), .. } => mouse_state.pos = (x as i32, y as i32),
-                    MouseInput { state, button, .. } => {
-                        match button {
-                            MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
-                            MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
-                            MouseButton::Middle => mouse_state.pressed.2 = state == Pressed,
-                            _ => {}
-                        }
-                    }
+                    CursorMoved {
+                        position: (x, y), ..
+                    } => mouse_state.pos = (x as i32, y as i32),
+                    MouseInput { state, button, .. } => match button {
+                        MouseButton::Left => mouse_state.pressed.0 = state == Pressed,
+                        MouseButton::Right => mouse_state.pressed.1 = state == Pressed,
+                        MouseButton::Middle => mouse_state.pressed.2 = state == Pressed,
+                        _ => {}
+                    },
                     MouseWheel {
                         delta: MouseScrollDelta::LineDelta(_, y),
                         phase: TouchPhase::Moved,
                         ..
-                    } |
-                    MouseWheel {
+                    }
+                    | MouseWheel {
                         delta: MouseScrollDelta::PixelDelta(_, y),
                         phase: TouchPhase::Moved,
                         ..
@@ -164,7 +170,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
             window.set_cursor_state(glutin::CursorState::Hide).unwrap();
         } else {
             // Set OS cursor
-            window.set_cursor_state(glutin::CursorState::Normal).unwrap();
+            window
+                .set_cursor_state(glutin::CursorState::Normal)
+                .unwrap();
             window.set_cursor(match mouse_cursor {
                 ImGuiMouseCursor::None => unreachable!("mouse_cursor was None!"),
                 ImGuiMouseCursor::Arrow => glutin::MouseCursor::Arrow,
@@ -190,9 +198,9 @@ pub fn run<F: FnMut(&Ui) -> bool>(title: String, clear_color: [f32; 4], mut run_
         }
 
         encoder.clear(&main_color, clear_color);
-        renderer.render(ui, &mut factory, &mut encoder).expect(
-            "Rendering failed",
-        );
+        renderer
+            .render(ui, &mut factory, &mut encoder)
+            .expect("Rendering failed");
         encoder.flush(&mut device);
         window.context().swap_buffers().unwrap();
         device.cleanup();
@@ -229,15 +237,13 @@ fn update_mouse(imgui: &mut ImGui, mouse_state: &mut MouseState) {
         mouse_state.pos.0 as f32 / scale.0,
         mouse_state.pos.1 as f32 / scale.1,
     );
-    imgui.set_mouse_down(
-        &[
-            mouse_state.pressed.0,
-            mouse_state.pressed.1,
-            mouse_state.pressed.2,
-            false,
-            false,
-        ],
-    );
+    imgui.set_mouse_down(&[
+        mouse_state.pressed.0,
+        mouse_state.pressed.1,
+        mouse_state.pressed.2,
+        false,
+        false,
+    ]);
     imgui.set_mouse_wheel(mouse_state.wheel / scale.1);
     mouse_state.wheel = 0.0;
 }

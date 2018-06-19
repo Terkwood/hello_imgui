@@ -20,4 +20,4 @@ for providing rust bindings to imgui.
 
 Thank you to the providers of [Go Mono](https://fontlibrary.org/en/font/go-mono) font.
 
-Dear ImGui, imgu-rs, and Go Mono all appear to support MIT license.
+Dear ImGui, imgu-rs, and Go Mono use the MIT license.
